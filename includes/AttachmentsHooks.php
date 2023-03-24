@@ -13,13 +13,15 @@ class AttachmentsHooks {
 
 	public static function renderAttach( Parser $parser, $page) {
 		$title = Title::newFromText($page);
-		$parser->getOutput()->setProperty(Attachments::getAttachPropname($title), $title);
+		$parser->getOutput()->setPageProperty(Attachments::getAttachPropname($title), $title);
 
-		$parser->getOutput()->setProperty(Attachments::PROP_ATTACH, true); # allow querying with API:Pageswithprop
+		$parser->getOutput()->setPageProperty(Attachments::PROP_ATTACH, true); # allow querying with API:Pageswithprop
 		if ($parser->getTitle()->inNamespace(NS_FILE))
 			# add category for $wgCountCategorizedImagesAsUsed
-			$parser->getOutput()->addTrackingCategory('attachments-category-attached-files', $parser->getTitle());
+			//$parser->getOutput()->addTrackingCategory('attachments-category-attached-files', $parser->getTitle());
+			$parser->addTrackingCategory('attachments-category-attached-files', $parser->getTitle());
 
+		$parser->getLinkRenderer()->setForceArticlePath(true);
 		return [self::msg(wfMessage('attached-to').' <b>'.$parser->getLinkRenderer()->makeKnownLink($title, null, [], ['redirect'=>'no']).'</b>'), 'isHTML'=>true];
 	}
 
@@ -34,10 +36,10 @@ class AttachmentsHooks {
 		$status = Attachments::validateURL($url);
 
 		if ($status === true){
-			$out->setProperty(Attachments::PROP_URL, $url);
+			$out->setPageProperty(Attachments::PROP_URL, $url);
 			return self::msg("&rarr; $url");
 		} else {
-			$out->setProperty(Attachments::PROP_URL, 'invalid');
+			$out->setPageProperty(Attachments::PROP_URL, 'invalid');
 			$out->addTrackingCategory('attachments-category-exturl-error', $parser->getTitle());
 			return self::msg($status.' '.wfEscapeWikiText($url), 'error');
 		}
@@ -50,8 +52,8 @@ class AttachmentsHooks {
 	}
 
 	public static function renderAttachmentsIgnoreSubpages(Parser $parser, $prefix){
-		$value = Title::newFromText($parser->mStripState->unstripBoth($prefix))->getDBKey();
-		$parser->getOutput()->setProperty(Attachments::PROP_IGNORE_SUBPAGES, $value);
+		$value = Title::newFromText($parser->getStripState()->unstripBoth($prefix))->getDBKey();
+		$parser->getOutput()->setPageProperty(Attachments::PROP_IGNORE_SUBPAGES, $value);
 	}
 
 	public static function onBeforePageDisplay( OutputPage $out, Skin $skin ) {
@@ -103,7 +105,7 @@ class AttachmentsHooks {
 		];
 	}
 
-	public static function onSkinTemplateNavigation( SkinTemplate &$sktemplate, array &$links ) {
+	public static function onSkinTemplateNavigationUniversal( SkinTemplate &$sktemplate, array &$links ) {
 		if (!Attachments::isViewingApplicablePage($sktemplate) || Attachments::hasExtURL($sktemplate->getTitle()))
 			return;
 

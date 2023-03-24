@@ -31,7 +31,7 @@ class Attachments {
 	}
 
 	public static function hasExtURL($title){
-		return !empty(PageProps::getInstance()->getProperties($title, self::PROP_URL));
+		return !empty(MediaWikiServices::getInstance()->getPageProps()->getProperties($title, self::PROP_URL));
 	}
 
 	public static function getAttachPropname($title){
@@ -70,7 +70,7 @@ class Attachments {
 			'page_title'.$dbr->buildLike($title->getDBkey().'/', $dbr->anyString()),
 			'page_namespace'=>$title->getNamespace()
 		];
-		foreach (PageProps::getInstance()->getProperties($title, self::PROP_IGNORE_SUBPAGES) as $id => $pattern){
+		foreach (MediaWikiServices::getInstance()->getPageProps()->getProperties($title, self::PROP_IGNORE_SUBPAGES) as $id => $pattern){
 			$subpageCond[] = 'page_title NOT '.$dbr->buildLike($title->getDBKey() . '/' . $pattern, $dbr->anyString());
 		}
 
