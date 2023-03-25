@@ -106,7 +106,7 @@ class SubpageForm extends HTMLForm {
 	}
 }
 
-class  LinkForm extends HTMLForm {
+class LinkForm extends HTMLForm {
 	function __construct($context) {
 		parent::__construct([
 			'Subpage' => [
@@ -139,9 +139,13 @@ class  LinkForm extends HTMLForm {
 		}
 		$status = WikiPage::factory(
 			$title->getSubpage(Title::capitalize($data['Subpage']))
-		)->doEditContent(
+		)->doUserEditContent(
 			new WikitextContent("{{#exturl:${data['URL']}}}"),
-			$this->msg('attach-addlink-editmsg'), EDIT_NEW, false, null, null, ['attachments-add-exturl']
+			$this->getUser(),
+			$this->msg('attach-addlink-editmsg'),
+			EDIT_NEW,
+			false,
+			['attachments-add-exturl']
 		);
 		$this->getOutput()->redirect($title->getFullURL());
 	}
