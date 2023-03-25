@@ -18,7 +18,6 @@ class AttachmentsHooks {
 		$parser->getOutput()->setPageProperty(Attachments::PROP_ATTACH, true); # allow querying with API:Pageswithprop
 		if ($parser->getTitle()->inNamespace(NS_FILE))
 			# add category for $wgCountCategorizedImagesAsUsed
-			//$parser->getOutput()->addTrackingCategory('attachments-category-attached-files', $parser->getTitle());
 			$parser->addTrackingCategory('attachments-category-attached-files', $parser->getTitle());
 
 		$parser->getLinkRenderer()->setForceArticlePath(true);
@@ -40,7 +39,7 @@ class AttachmentsHooks {
 			return self::msg("&rarr; $url");
 		} else {
 			$out->setPageProperty(Attachments::PROP_URL, 'invalid');
-			$out->addTrackingCategory('attachments-category-exturl-error', $parser->getTitle());
+			$parser->addTrackingCategory('attachments-category-exturl-error', $parser->getTitle());
 			return self::msg($status.' '.wfEscapeWikiText($url), 'error');
 		}
 	}
